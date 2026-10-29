@@ -1,0 +1,23 @@
+# ============================================================================
+# .htaccess (Apache / WAMP) - requiere mod_rewrite activo y AllowOverride All
+# ============================================================================
+
+# Pasa el encabezado Authorization (el token) a PHP: Apache lo descarta por defecto en algunas configuraciones
+RewriteEngine On
+RewriteCond %{HTTP:Authorization} .
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+# No lista el contenido de las carpetas si alguien las abre en el navegador
+Options -Indexes
+
+# Bloquea el acceso directo desde el navegador a las carpetas internas (código, SQL, etc.)
+RewriteRule ^(config|controllers|models|routes|helpers|database|postman)(/|$) - [F,L]
+
+# Todo lo que empiece con "api/" y no sea un archivo real se envía al punto de entrada de la API
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^api/ api/index.php [QSA,L]
+
+# Prohíbe descargar el archivo .env (guarda credenciales) y cualquier otro archivo oculto con ese nombre
+<FilesMatch "^\.env">
+    Require all denied
+</FilesMatch>

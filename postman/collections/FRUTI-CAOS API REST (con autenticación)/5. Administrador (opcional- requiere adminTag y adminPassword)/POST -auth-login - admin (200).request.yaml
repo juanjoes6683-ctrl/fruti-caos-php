@@ -1,0 +1,19 @@
+$kind: http-request
+name: POST /auth/login - admin (200)
+url: "{{baseUrl}}/auth/login"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: '{"tag": "{{adminTag}}", "password": "{{adminPassword}}"}'
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Código HTTP 200", function () { pm.response.to.have.status(200); });
+      pm.test("Responde JSON", function () { pm.response.to.be.json; });
+      var r = pm.response.json();
+      pm.collectionVariables.set("tokenAdmin", r.token);
+      pm.test("Es administrador", function () { pm.expect(r.jugador.rol).to.eql("admin"); });
+    language: text/javascript
+order: 1000

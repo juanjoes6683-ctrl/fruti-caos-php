@@ -1,0 +1,18 @@
+$kind: http-request
+name: PUT /partidas/:id - jugador común (403, solo admin)
+url: "{{baseUrl}}/partidas/{{partidaId}}"
+method: PUT
+headers:
+  Authorization: Bearer {{token}}
+  Content-Type: application/json
+body:
+  type: json
+  content: '{"puntaje": 999999, "nivel_jugo": 5, "resultado": "jugo"}'
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Código HTTP 403", function () { pm.response.to.have.status(403); });
+      pm.test("Responde JSON", function () { pm.response.to.be.json; });
+      pm.test("Trae el campo error", function () { pm.expect(pm.response.json()).to.have.property("error"); });
+    language: text/javascript
+order: 11000

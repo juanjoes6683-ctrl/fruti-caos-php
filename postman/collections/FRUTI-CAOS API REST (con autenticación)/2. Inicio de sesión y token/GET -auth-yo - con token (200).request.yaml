@@ -1,0 +1,14 @@
+$kind: http-request
+name: GET /auth/yo - con token (200)
+url: "{{baseUrl}}/auth/yo"
+method: GET
+headers:
+  Authorization: Bearer {{token}}
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Código HTTP 200", function () { pm.response.to.have.status(200); });
+      pm.test("Responde JSON", function () { pm.response.to.be.json; });
+      pm.test("Es el jugador 1", function () { pm.expect(pm.response.json().id).to.eql(parseInt(pm.collectionVariables.get("jugadorId"))); });
+    language: text/javascript
+order: 5000

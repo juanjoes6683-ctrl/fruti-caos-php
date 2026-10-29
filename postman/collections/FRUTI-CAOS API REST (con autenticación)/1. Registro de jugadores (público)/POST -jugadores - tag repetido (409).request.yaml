@@ -1,0 +1,17 @@
+$kind: http-request
+name: POST /jugadores - tag repetido (409)
+url: "{{baseUrl}}/jugadores"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: '{"tag": "{{tagUnico}}", "password": "{{password}}"}'
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Código HTTP 409", function () { pm.response.to.have.status(409); });
+      pm.test("Responde JSON", function () { pm.response.to.be.json; });
+      pm.test("Trae el campo error", function () { pm.expect(pm.response.json()).to.have.property("error"); });
+    language: text/javascript
+order: 3000

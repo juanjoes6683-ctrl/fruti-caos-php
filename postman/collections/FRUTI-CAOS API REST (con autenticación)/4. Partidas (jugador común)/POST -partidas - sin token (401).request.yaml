@@ -1,0 +1,17 @@
+$kind: http-request
+name: POST /partidas - sin token (401)
+url: "{{baseUrl}}/partidas"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: '{"puntaje": 100, "nivel_jugo": 1}'
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Código HTTP 401", function () { pm.response.to.have.status(401); });
+      pm.test("Responde JSON", function () { pm.response.to.be.json; });
+      pm.test("Trae el campo error", function () { pm.expect(pm.response.json()).to.have.property("error"); });
+    language: text/javascript
+order: 1000

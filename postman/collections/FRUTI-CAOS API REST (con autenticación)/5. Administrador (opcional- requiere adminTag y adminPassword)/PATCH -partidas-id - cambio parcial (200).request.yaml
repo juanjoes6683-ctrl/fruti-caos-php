@@ -1,0 +1,18 @@
+$kind: http-request
+name: PATCH /partidas/:id - cambio parcial (200)
+url: "{{baseUrl}}/partidas/{{partidaId}}"
+method: PATCH
+headers:
+  Authorization: Bearer {{tokenAdmin}}
+  Content-Type: application/json
+body:
+  type: json
+  content: '{"nivel_jugo": 3}'
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Código HTTP 200", function () { pm.response.to.have.status(200); });
+      pm.test("Responde JSON", function () { pm.response.to.be.json; });
+      pm.test("El nivel cambió", function () { pm.expect(pm.response.json().nivel_jugo).to.eql(3); });
+    language: text/javascript
+order: 6000

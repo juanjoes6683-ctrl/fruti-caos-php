@@ -1,0 +1,14 @@
+$kind: http-request
+name: GET /partidas/:id - inexistente (404)
+url: "{{baseUrl}}/partidas/999999"
+method: GET
+headers:
+  Authorization: Bearer {{token}}
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Código HTTP 404", function () { pm.response.to.have.status(404); });
+      pm.test("Responde JSON", function () { pm.response.to.be.json; });
+      pm.test("Trae el campo error", function () { pm.expect(pm.response.json()).to.have.property("error"); });
+    language: text/javascript
+order: 10000

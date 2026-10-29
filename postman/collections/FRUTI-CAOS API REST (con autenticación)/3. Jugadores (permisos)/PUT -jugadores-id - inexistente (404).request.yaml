@@ -1,0 +1,18 @@
+$kind: http-request
+name: PUT /jugadores/:id - inexistente (404)
+url: "{{baseUrl}}/jugadores/999999"
+method: PUT
+headers:
+  Authorization: Bearer {{token}}
+  Content-Type: application/json
+body:
+  type: json
+  content: '{"tag": "NoExiste"}'
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Código HTTP 404", function () { pm.response.to.have.status(404); });
+      pm.test("Responde JSON", function () { pm.response.to.be.json; });
+      pm.test("Trae el campo error", function () { pm.expect(pm.response.json()).to.have.property("error"); });
+    language: text/javascript
+order: 13000

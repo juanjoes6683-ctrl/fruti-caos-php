@@ -1,0 +1,18 @@
+$kind: http-request
+name: POST /partidas - a nombre de otro jugador (403)
+url: "{{baseUrl}}/partidas"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Content-Type: application/json
+body:
+  type: json
+  content: '{"jugador_id": {{jugadorId2}}, "puntaje": 100, "nivel_jugo": 1}'
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Código HTTP 403", function () { pm.response.to.have.status(403); });
+      pm.test("Responde JSON", function () { pm.response.to.be.json; });
+      pm.test("Trae el campo error", function () { pm.expect(pm.response.json()).to.have.property("error"); });
+    language: text/javascript
+order: 3000

@@ -1,0 +1,18 @@
+$kind: http-request
+name: PUT /jugadores/:id - actualizar el propio (200)
+url: "{{baseUrl}}/jugadores/{{jugadorId}}"
+method: PUT
+headers:
+  Authorization: Bearer {{token}}
+  Content-Type: application/json
+body:
+  type: json
+  content: '{"tag": "{{tagUnico}}_2"}'
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Código HTTP 200", function () { pm.response.to.have.status(200); });
+      pm.test("Responde JSON", function () { pm.response.to.be.json; });
+      pm.test("El tag cambió", function () { pm.expect(pm.response.json().tag).to.include("_2"); });
+    language: text/javascript
+order: 8000

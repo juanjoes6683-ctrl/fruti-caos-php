@@ -1,0 +1,633 @@
+:root {
+  --bg: #f5e9df;
+  --tray: #fff3e6;
+  --jar-bg: linear-gradient(#ebf2ee, #ebf4f0);
+  --accent: #ff6b6b;
+  --jar-width: 420px;
+  --jar-height: 520px;
+  
+  --blender-base-color: #ebba94bd;
+  --juice-color: rgba(255, 120, 120, 0.9); 
+  --juice-wave-color: rgba(255, 90, 90, 0.95); 
+}
+
+* {
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif; 
+}
+
+body {
+  margin: 0;
+  background-color: #f3e1b6; 
+  color: #000000;
+  display: flex;
+  flex-direction: column; /* Apila los elementos */
+  justify-content: flex-start; 
+  align-items: center; /* Centra TODO el contenido horizontalmente */
+  padding: 0; 
+  min-height: 100vh;
+}
+
+header {
+  font-size: 60px;
+  line-height: 1; /* Para que las letras no se separen demasiado */
+  text-align: center;
+  background-image: url('imagenes/frutitas.jpg');
+  padding: 25px;
+  width: 100%; 
+  height: auto;
+  position: relative; 
+  color: #000000;
+}
+.fruti- {
+  font-family: 'Luckiest Guy', cursive; 
+  font-size: 1.1em; /* Asegura que la fuente sea grande */
+
+  /* Color interno del texto (relleno) */
+  color: #D13A3A;
+  
+  /* Efecto de Borde Blanco */
+  text-shadow: 
+    /* Borde grueso en todas las direcciones (el color blanco) */
+    -3px -3px 0 #FFFFFF,  /* Arriba-Izquierda */
+     3px -3px 0 #FFFFFF,  /* Arriba-Derecha */
+    -3px  3px 0 #FFFFFF,  /* Abajo-Izquierda */
+     3px  3px 0 #FFFFFF,  /* Abajo-Derecha */
+     
+    /* Sombra de fondo (para darle profundidad sobre el fondo de imagen) */
+    5px 5px 5px rgba(0, 0, 0, 0.4); 
+}
+.caos {
+  font-family: 'Luckiest Guy', cursive;
+  font-size: 1.1em; /* Asegura que la fuente sea grande */
+  
+  /* Color interno del texto (relleno) */
+  color: #15D2B8; /* Verde Lima */
+  
+  /* Efecto de Borde Blanco */
+  text-shadow: 
+    /* Borde grueso en todas las direcciones (el color blanco) */
+    -3px -3px 0 #FFFFFF,
+     3px -3px 0 #FFFFFF,
+    -3px  3px 0 #FFFFFF,
+     3px  3px 0 #FFFFFF,
+     
+    /* Sombra de fondo (para darle profundidad sobre el fondo de imagen) */
+    5px 5px 5px rgba(0, 0, 0, 0.4); 
+}
+
+footer{
+  text-align: center;
+  background-image: url('imagenes/frutitas.jpg');
+  padding: 25px;
+  width: 100%; 
+  height: auto;
+  position: relative; 
+  font-size: 30px;
+  color:#000000;
+  margin-top: 50px; 
+}
+
+.copyright-text,
+footer { 
+  font-family: Arial, Helvetica, sans-serif; 
+  font-size: 1.1em;
+  color: rgba(0, 0, 0, 0.6); 
+}
+
+#app {                  /* vista en pantalla */
+  display:flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-end; 
+  gap: 60px;
+  max-width: 800px;
+  width: 100%;
+  margin: 100px auto; 
+}
+
+aside#tray {            
+  position: relative; 
+  width: 240px; /* Ancho deseado */
+  height: auto; 
+  background-image: url('imagenes/canastito.jpg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 130% 110%;
+  border: 8px solid #c0b18e; 
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); 
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: opacity 0.5s ease-out; 
+  
+  /* mierditas inmundas */
+  margin: 0;
+  left: 0;
+  bottom: 0;
+}
+
+#fruits-list {                  /*frutas que estan dentro del canasto*/
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  min-height: 50px;
+  align-self: center;
+}
+
+.fruit-draggable {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%; /* MODIFICADO: Frutas más redondas */
+  background: #ffe0b2;
+  border: 3px solid #ffab40; /* MODIFICADO: Borde más grueso */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  cursor: grab;
+  user-select: none;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.1s;
+}
+.fruit-draggable:active {
+    cursor: grabbing;
+    transform: scale(1.05);
+}
+
+
+.controls {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+button#restartBtn, #modal-restart-btn, #play-btn, #menu-btn, #register-btn { /* MODIFICADO: Estilo de botón */
+  padding: 10px 15px;
+  border-radius: 20px; 
+  border: 2px solid white;
+  background: var(--accent);
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 0 0 #d13a3a; /* Efecto 3D */
+  transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+  margin: 15px;
+}
+
+button:active {                     
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 0 #d13a3a;
+}
+
+#score {                /* marcador de puntuacion */  
+  font-weight: bold;
+  text-align: center;
+  padding: 5px 0;
+  color: #000000;
+  font-size: 20px;
+}
+
+main {
+  flex: 1;
+}
+
+#jar-wrapper {              
+  display: flex;
+  justify-content: center;
+  position: relative; 
+  height: 497px;
+  width: 386px;
+  
+  /* estas mierditas hacian que se vea choto*/
+  margin: 0;
+  bottom: 0;
+  left: 0;
+}
+
+#jar-container {          
+    position: relative;
+    width: 350px;
+    height: 520px;
+    margin: 5px;
+}
+
+#jar {                          /*la maldita jarra*/
+  width: 350px;
+  height: 400px;
+  border-radius: 18px;
+  border: 8px solid rgba(72, 70, 70, 0.06);
+  background: var(--jar-bg);
+  position:absolute; 
+  bottom: 25px; 
+  overflow: hidden;
+  box-shadow: inset 0 6px 18px rgba(0, 0, 0, 0.06);
+  transition: transform 0.5s ease-out, border-radius 0.5s ease-out;
+  z-index: 5;
+}
+
+#vidrio {                         /*vidrio delante de la jarra*/
+  width: 350px;
+  height: 400px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background-color: #84aca7;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  position:absolute; 
+  bottom: 25px; 
+  overflow: hidden;
+  box-shadow: inset 0 6px 18px rgba(0, 0, 0, 0.06);
+  transition: transform 0.5s ease-out, border-radius 0.5s ease-out;
+  z-index: 5;
+  opacity: 0.15;
+  pointer-events: none;
+
+}
+
+#blender-base {               /*base de la licuadora*/
+  position:absolute;
+  width: 325px;
+  height: 77px;
+  background: var(--blender-base-color);
+  border-radius: 55px 55px 10px 10px;
+  border: 8px solid #e2bda0bd;
+  transform: (180deg);
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px); 
+  z-index: 1; 
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  transition: transform 0.5s ease-out;
+  text-align: center;
+}
+
+#game-over-line {             /* estilo para la línea de Game Over */
+    position: absolute;
+    top: 7px; /* <--- Píxeles desde el borde superior de la jarra (#jar) */
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background-color: #ff0000; /* Rojo vibrante */
+    z-index: 50; /* Asegura que esté por encima de las frutas */
+    pointer-events: none; /* No interfiere con las interacciones */
+    opacity: 0.03;
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+}
+
+.blender-mode #jar {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  transform: translateY(-80px); 
+}
+
+.blender-mode #vidrio {
+  transform: translateY(-80px); 
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.blender-mode #blender-base {
+  transform: translateX(-50%) translateY(0); 
+}
+
+.jar-fruit {
+  position: absolute;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+  user-select: none;
+  pointer-events: auto;
+  transition: opacity 0.5s ease-out, transform 0.5s ease-out; 
+}
+
+/* EFECTO DE FADE PARA FUSIÓN (MEJORADO) */
+.jar-fruit.fading {
+    opacity: 0;
+    transform: scale(0.1) rotate(180deg); /* Animación más dramática */
+    transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+}
+
+/* NUEVOS ESTILOS PARA LA PUNTUACIÓN FLOTANTE */
+.floating-score {
+    position: absolute;
+    color: #ffaa00;
+    font-size: 20px;
+    font-weight: 900;
+    pointer-events: none;
+    user-select: none;
+    animation: floatAndFade 1s ease-out forwards;
+    z-index: 20;
+    text-shadow: 1px 1px 2px #333;
+}
+
+@keyframes floatAndFade {
+    0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-50px) scale(0.8);
+    }
+}
+
+#drop-line-guide {
+    position: absolute;
+    top: 0;
+    width: 2px; /* Grosor de la línea */
+    height: 100%; /* Cubre toda la altura de la jarra */
+    background: rgba(255, 255, 255, 0.5); /* Color blanco semi-transparente */
+    border-left: 3px dashed rgba(0, 0, 0, 0.2); /* Estilo de línea punteada sutil */
+    pointer-events: none; /* Asegura que la línea no interfiera con el drop */
+    display: none; /* Oculta por defecto */
+    z-index: 15; /* Asegura que esté por encima de las frutas y el jugo */
+    transition: left 0s linear; /* Para una actualización de posición suave */
+}
+
+#blender-blade {          /*hojas de la licuadora*/
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 100px;
+  height: 5px;
+  background: #666;
+  transform: translateX(-50%);
+  z-index: 10;
+  opacity: 0; 
+  transition: opacity 0.5s;
+}
+
+@keyframes spin {
+  from { transform: translateX(-50%) rotate(0deg); }
+  to { transform: translateX(-50%) rotate(360deg); }
+}
+
+@keyframes blade-glow {                   
+    0%, 100% { box-shadow: 0 0 10px 5px rgba(255, 200, 0, 0.8), 0 0 20px 10px rgba(255, 100, 0, 0.5); }
+    50% { box-shadow: 0 0 15px 8px rgba(255, 230, 0, 1), 0 0 30px 15px rgba(255, 150, 0, 0.7); }
+}
+
+.blade-spinning {
+  animation: spin 0.05s linear infinite; 
+  opacity: 1 !important;
+  animation-name: spin, blade-glow; 
+  animation-duration: 0.05s, 1s;
+  animation-timing-function: linear, ease-in-out;
+  animation-iteration-count: infinite, infinite;
+}
+
+#blender-juice {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: transparent; 
+  z-index: 5; 
+  transition: height 1.5s ease-out; 
+  overflow: hidden; 
+}
+
+#blender-juice::before {
+    content: '';
+    position: absolute;
+    width: 200%; 
+    height: 100%;
+    top: 5px; 
+    left: 0;
+    background-color: var(--juice-color); 
+    border-radius: 40% 45% 0 0 / 100% 100% 0 0; 
+    transform: translateX(0);
+    animation: wave-move 5s linear infinite; 
+    box-shadow: 0 0 8px rgba(255, 100, 100, 0.3); 
+}
+
+#blender-juice::after {
+    content: '';
+    position: absolute;
+    width: 200%;
+    height: 100%;
+    top: 10px; 
+    left: 0;
+    background-color: var(--juice-wave-color); 
+    border-radius: 35% 40% 0 0 / 100% 100% 0 0; 
+    transform: translateX(0);
+    animation: wave-move 7s linear reverse infinite; 
+    opacity: 0.8;
+}
+
+@keyframes wave-move {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); } 
+}
+
+.juice-level-0 { height: 0%; }
+.juice-level-1 { height: 15%; }
+.juice-level-2 { height: 30%; }
+.juice-level-3 { height: 50%; }
+.juice-level-4 { height: 70%; }
+.juice-level-5 { height: 90%; }
+
+.jar-fruit.blending {
+  opacity: 0;
+  transform: translate(0, 100px) scale(0.1); 
+  transition: opacity 0.5s ease-out, transform 0.5s ease-in; 
+}
+
+.notes {
+  color: #151212;
+  margin-top: 0px;
+}
+
+.explosion-star {
+  position: absolute;
+  font-size: 16px; 
+  pointer-events: none;
+  opacity: 1;
+  transition: all 1s ease-out; 
+  text-shadow: 0 0 5px yellow;
+}
+
+/* ESTILOS DEL MODAL DE FIN DE JUEGO */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: none; /* Oculto por defecto */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-overlay.visible {
+    display: flex;
+}
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    transform: scale(0.8);
+    opacity: 0;
+    animation: modal-pop 0.3s forwards;
+    border: 5px solid var(--accent);
+}
+
+@keyframes modal-pop {
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.modal-header h3 {
+    color: var(--accent);
+    margin-top: 10px;
+    font-size: 1.8em;
+}
+
+#modal-emoji {
+    font-size: 3em;
+    display: block;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.final-stats {
+    font-size: 1.1em;
+    margin: 10px 0;
+    font-weight: bold;
+}
+
+.final-stats span {
+    color: #007bff;
+}
+/* -- MEDIA QUERY para que se vea bien en celulares y tablets tiny -- */
+@media (max-width: 768px) {
+  #app {
+    flex-direction: column; 
+    align-items: center;
+    gap: 15px;
+    margin: 20px 0;
+  }
+
+  aside#tray, #jar-wrapper {
+    width: 90%; /* Ocupa la mayor parte del ancho de la pantalla */
+    min-width: unset;
+  }
+  
+  header, footer {
+      font-size: 25px; /* Reduce el tamaño del título */
+      padding: 15px;
+  }
+}
+/* ===== PANTALLA DE INICIO ===== */
+#start-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;               /* por encima del juego y del modal */
+  background-color: #f3e1b6;
+  background-image: url('imagenes/frutitas.jpg');
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+#start-screen.oculta { display: none; }
+
+.start-card {
+  background: var(--tray);
+  border: 5px solid var(--accent);
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  padding: 25px 30px;
+  width: 100%;
+  max-width: 480px;
+  margin: auto;                /* centrado vertical sin cortar el contenido en pantallas chicas */
+  text-align: center;
+}
+.start-title { margin: 0 0 15px; font-size: 3em; line-height: 1; }
+.start-label { display: block; font-weight: bold; margin-bottom: 8px; }
+
+#player-tag, #player-password {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+  max-width: 280px;
+  padding: 10px 14px;
+  border-radius: 20px;
+  border: 3px solid var(--accent);
+  font-size: 1.1em;
+  text-align: center;
+}
+#tag-error { min-height: 1.3em; margin: 6px 0 0; color: #d13a3a; font-weight: bold; }
+
+#player-password { margin-top: 10px; }
+#play-btn { font-size: 1.3em; padding: 12px 40px; margin: 5px 0 15px; }
+
+#menu-btn, #register-btn { background: #6c8ebf; box-shadow: 0 4px 0 0 #4f6f9f; }
+#menu-btn:active, #register-btn:active { box-shadow: 0 2px 0 0 #4f6f9f; }
+#register-btn { margin: 5px 0 15px 8px; }
+#save-score-msg { min-height: 1.2em; margin: 8px 0 0; font-weight: bold; color: #007bff; }
+
+/* ===== TABLA DE PUNTAJES ===== */
+#ranking-box h2 { margin: 5px 0 10px; font-size: 1.2em; color: #d13a3a; }
+
+/* Se ven 5 filas (+ el encabezado); las otras 5 se ven deslizando hacia abajo */
+#ranking-scroll {
+  max-height: 218px;          /* encabezado 36px + 5 filas de 36px + bordes */
+  overflow-y: auto;
+  background: white;
+  border-radius: 12px;
+}
+#ranking-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 0.95em;
+}
+#ranking-table th {
+  position: sticky;           /* el encabezado queda fijo mientras se desliza */
+  top: 0;
+  z-index: 1;
+  background: var(--accent);
+  color: white;
+}
+#ranking-table th, #ranking-table td {
+  height: 36px;
+  padding: 0 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;    /* un tag largo no agranda la fila */
+}
+#ranking-table th:nth-child(1) { width: 14%; }
+#ranking-table th:nth-child(2) { width: 42%; }
+#ranking-table th:nth-child(3) { width: 24%; }
+#ranking-table th:nth-child(4) { width: 20%; }
+#ranking-table td { border-bottom: 1px solid #f0d9c8; }
+#ranking-table tbody tr:nth-child(even) { background: #fff8f2; }
+#ranking-table tbody tr:first-child { font-weight: bold; background: #fff3c4; }
+#ranking-table .r-nombre { text-align: left; }
+#ranking-table .r-puntos { color: #007bff; font-weight: bold; }
+#ranking-table .vacio { color: #888; }

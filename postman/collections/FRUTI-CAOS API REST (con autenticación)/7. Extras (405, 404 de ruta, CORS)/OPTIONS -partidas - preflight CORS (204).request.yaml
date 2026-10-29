@@ -1,0 +1,15 @@
+$kind: http-request
+name: OPTIONS /partidas - preflight CORS (204)
+url: "{{baseUrl}}/partidas"
+method: OPTIONS
+headers:
+  Origin: http://localhost
+  Access-Control-Request-Method: POST
+  Access-Control-Request-Headers: authorization,content-type
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Código HTTP 204", function () { pm.response.to.have.status(204); });
+      pm.test("Trae encabezados CORS", function () { pm.expect(pm.response.headers.has("Access-Control-Allow-Methods")).to.be.true; });
+    language: text/javascript
+order: 3000

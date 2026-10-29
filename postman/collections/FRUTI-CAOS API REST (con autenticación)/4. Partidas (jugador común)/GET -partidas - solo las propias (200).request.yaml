@@ -1,0 +1,15 @@
+$kind: http-request
+name: GET /partidas - solo las propias (200)
+url: "{{baseUrl}}/partidas"
+method: GET
+headers:
+  Authorization: Bearer {{token}}
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Código HTTP 200", function () { pm.response.to.have.status(200); });
+      pm.test("Responde JSON", function () { pm.response.to.be.json; });
+      pm.test("Devuelve un array", function () { pm.expect(pm.response.json()).to.be.an("array"); });
+      pm.test("Todas son del jugador 1", function () { var id = parseInt(pm.collectionVariables.get("jugadorId")); pm.response.json().forEach(function (p) { pm.expect(p.jugador_id).to.eql(id); }); });
+    language: text/javascript
+order: 7000

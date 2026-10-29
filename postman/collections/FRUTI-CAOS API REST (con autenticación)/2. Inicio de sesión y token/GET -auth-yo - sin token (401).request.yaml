@@ -1,0 +1,12 @@
+$kind: http-request
+name: GET /auth/yo - sin token (401)
+url: "{{baseUrl}}/auth/yo"
+method: GET
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Código HTTP 401", function () { pm.response.to.have.status(401); });
+      pm.test("Responde JSON", function () { pm.response.to.be.json; });
+      pm.test("Trae el campo error", function () { pm.expect(pm.response.json()).to.have.property("error"); });
+    language: text/javascript
+order: 6000

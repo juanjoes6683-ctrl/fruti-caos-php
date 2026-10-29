@@ -1,0 +1,2566 @@
+{
+  "info": {
+    "name": "FRUTI-CAOS API REST (con autenticación)",
+    "description": "Pruebas de todos los endpoints (200, 201, 204, 400, 401, 403, 404, 405, 409). Ejecutar con Collection Runner en orden: las carpetas dependen unas de otras (guardan tokens e ids). La carpeta 5 requiere un usuario admin (ver LEEME.md): si no lo tenés, destildala en el Runner.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Registro de jugadores (público)",
+      "item": [
+        {
+          "name": "POST /jugadores - registro jugador 1 (201)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/jugadores",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jugadores"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"tag\": \"{{tagUnico}}\", \"password\": \"{{password}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"tagUnico\", \"Tester\" + Date.now().toString().slice(-6));",
+                  "pm.collectionVariables.set(\"tagUnico2\", \"Otro\" + Date.now().toString().slice(-6));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "var r = pm.response.json();",
+                  "pm.collectionVariables.set(\"jugadorId\", r.id);",
+                  "pm.test(\"Devuelve el id\", function () { pm.expect(r).to.have.property(\"id\"); });",
+                  "pm.test(\"Nunca devuelve el hash de la contraseña\", function () { pm.expect(pm.response.text()).to.not.include(\"password_hash\"); });",
+                  "pm.test(\"Rol por defecto: jugador\", function () { pm.expect(r.rol).to.eql(\"jugador\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /jugadores - registro jugador 2 (201)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/jugadores",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jugadores"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"tag\": \"{{tagUnico2}}\", \"password\": \"{{password}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "var r = pm.response.json();",
+                  "pm.collectionVariables.set(\"jugadorId2\", r.id);",
+                  "pm.test(\"Devuelve el id\", function () { pm.expect(r).to.have.property(\"id\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /jugadores - tag repetido (409)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/jugadores",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jugadores"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"tag\": \"{{tagUnico}}\", \"password\": \"{{password}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 409\", function () { pm.response.to.have.status(409); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Trae el campo error\", function () { pm.expect(pm.response.json()).to.have.property(\"error\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /jugadores - sin password (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/jugadores",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jugadores"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"tag\": \"SinClave\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 400\", function () { pm.response.to.have.status(400); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Trae error y detalles\", function () { var r = pm.response.json(); pm.expect(r).to.have.property(\"error\"); pm.expect(r).to.have.property(\"detalles\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /jugadores - password corto (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/jugadores",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jugadores"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"tag\": \"ClaveCorta\", \"password\": \"123\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 400\", function () { pm.response.to.have.status(400); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Trae error y detalles\", function () { var r = pm.response.json(); pm.expect(r).to.have.property(\"error\"); pm.expect(r).to.have.property(\"detalles\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /jugadores - JSON inválido (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/jugadores",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jugadores"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"tag\": ",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 400\", function () { pm.response.to.have.status(400); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Trae el campo error\", function () { pm.expect(pm.response.json()).to.have.property(\"error\"); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2. Inicio de sesión y token",
+      "item": [
+        {
+          "name": "POST /auth/login - credenciales incorrectas (401)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"tag\": \"{{tagUnico}}\", \"password\": \"incorrecta\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 401\", function () { pm.response.to.have.status(401); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Trae el campo error\", function () { pm.expect(pm.response.json()).to.have.property(\"error\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /auth/login - tag inexistente (401)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"tag\": \"NoExisteNadie\", \"password\": \"loquesea\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 401\", function () { pm.response.to.have.status(401); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Trae el campo error\", function () { pm.expect(pm.response.json()).to.have.property(\"error\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /auth/login - faltan campos (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 400\", function () { pm.response.to.have.status(400); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Trae error y detalles\", function () { var r = pm.response.json(); pm.expect(r).to.have.property(\"error\"); pm.expect(r).to.have.property(\"detalles\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /auth/login - jugador 1 (200)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"tag\": \"{{tagUnico}}\", \"password\": \"{{password}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "var r = pm.response.json();",
+                  "pm.collectionVariables.set(\"token\", r.token);",
+                  "pm.test(\"Devuelve token Bearer y jugador\", function () { pm.expect(r.token).to.be.a(\"string\"); pm.expect(r.tipo).to.eql(\"Bearer\"); pm.expect(r.jugador.id).to.exist; });",
+                  "pm.test(\"Nunca devuelve el hash de la contraseña\", function () { pm.expect(pm.response.text()).to.not.include(\"password_hash\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /auth/yo - con token (200)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/yo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "yo"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Es el jugador 1\", function () { pm.expect(pm.response.json().id).to.eql(parseInt(pm.collectionVariables.get(\"jugadorId\"))); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /auth/yo - sin token (401)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/yo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "yo"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 401\", function () { pm.response.to.have.status(401); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Trae el campo error\", function () { pm.expect(pm.response.json()).to.have.property(\"error\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /auth/yo - token inválido (401)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer esto.no.esunjwt"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/yo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "yo"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 401\", function () { pm.response.to.have.status(401); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Trae el campo error\", function () { pm.expect(pm.response.json()).to.have.property(\"error\"); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "3. Jugadores (permisos)",
+      "item": [
+        {
+          "name": "GET /jugadores - sin token (401)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/jugadores",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jugadores"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 401\", function () { pm.response.to.have.status(401); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Trae el campo error\", function () { pm.expect(pm.response.json()).to.have.property(\"error\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /jugadores - jugador común (403)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/jugadores",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jugadores"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 403\", function () { pm.response.to.have.status(403); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Trae el campo error\", function () { pm.expect(pm.response.json()).to.have.property(\"error\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /jugadores/:id - el propio (200)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/jugadores/{{jugadorId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jugadores",
+                "{{jugadorId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Nunca devuelve el hash de la contraseña\", function () { pm.expect(pm.response.text()).to.not.include(\"password_hash\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /jugadores/:id - de otro jugador (403)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/jugadores/{{jugadorId2}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jugadores",
+                "{{jugadorId2}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 403\", function () { pm.response.to.have.status(403); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Trae el campo error\", function () { pm.expect(pm.response.json()).to.have.property(\"error\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /jugadores/:id - inexistente (404)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/jugadores/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jugadores",
+                "999999"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 404\", function () { pm.response.to.have.status(404); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Trae el campo error\", function () { pm.expect(pm.response.json()).to.have.property(\"error\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /jugadores/:id - id inválido (400)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/jugadores/abc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jugadores",
+                "abc"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 400\", function () { pm.response.to.have.status(400); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Trae el campo error\", function () { pm.expect(pm.response.json()).to.have.property(\"error\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /jugadores/:id - sin token (401)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/jugadores/{{jugadorId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jugadores",
+                "{{jugadorId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 401\", function () { pm.response.to.have.status(401); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Trae el campo error\", function () { pm.expect(pm.response.json()).to.have.property(\"error\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT /jugadores/:id - actualizar el propio (200)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/jugadores/{{jugadorId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jugadores",
+                "{{jugadorId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"tag\": \"{{tagUnico}}_2\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"El tag cambió\", function () { pm.expect(pm.response.json().tag).to.include(\"_2\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT /jugadores/:id - sin tag (400)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/jugadores/{{jugadorId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jugadores",
+                "{{jugadorId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 400\", function () { pm.response.to.have.status(400); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Trae error y detalles\", function () { var r = pm.response.json(); pm.expect(r).to.have.property(\"error\"); pm.expect(r).to.have.property(\"detalles\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH /jugadores/:id - cambiar contraseña (200)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/jugadores/{{jugadorId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jugadores",
+                "{{jugadorId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"password\": \"nuevaclave456\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Nunca devuelve el hash de la contraseña\", function () { pm.expect(pm.response.text()).to.not.include(\"password_hash\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH /jugadores/:id - cuerpo vacío (400)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/jugadores/{{jugadorId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jugadores",
+                "{{jugadorId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 400\", function () { pm.response.to.have.status(400); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Trae error y detalles\", function () { var r = pm.response.json(); pm.expect(r).to.have.property(\"error\"); pm.expect(r).to.have.property(\"detalles\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT /jugadores/:id - de otro jugador (403)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/jugadores/{{jugadorId2}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jugadores",
+                "{{jugadorId2}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"tag\": \"Intruso\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 403\", function () { pm.response.to.have.status(403); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Trae el campo error\", function () { pm.expect(pm.response.json()).to.have.property(\"error\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT /jugadores/:id - inexistente (404)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/jugadores/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jugadores",
+                "999999"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"tag\": \"NoExiste\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 404\", function () { pm.response.to.have.status(404); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Trae el campo error\", function () { pm.expect(pm.response.json()).to.have.property(\"error\"); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "4. Partidas (jugador común)",
+      "item": [
+        {
+          "name": "POST /partidas - sin token (401)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/partidas",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "partidas"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"puntaje\": 100, \"nivel_jugo\": 1}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 401\", function () { pm.response.to.have.status(401); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Trae el campo error\", function () { pm.expect(pm.response.json()).to.have.property(\"error\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /partidas - crear partida (201)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/partidas",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "partidas"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"puntaje\": 4200, \"nivel_jugo\": 2, \"resultado\": \"jugo\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "var r = pm.response.json();",
+                  "pm.collectionVariables.set(\"partidaId\", r.id);",
+                  "pm.test(\"Devuelve el id\", function () { pm.expect(r).to.have.property(\"id\"); });",
+                  "pm.test(\"Trae datos de ranking\", function () { pm.expect(r.ranking).to.have.property(\"posicion\"); pm.expect(r.jugador_id).to.eql(parseInt(pm.collectionVariables.get(\"jugadorId\"))); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /partidas - a nombre de otro jugador (403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/partidas",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "partidas"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"jugador_id\": {{jugadorId2}}, \"puntaje\": 100, \"nivel_jugo\": 1}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 403\", function () { pm.response.to.have.status(403); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Trae el campo error\", function () { pm.expect(pm.response.json()).to.have.property(\"error\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /partidas - puntaje negativo (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/partidas",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "partidas"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"puntaje\": -5, \"nivel_jugo\": 2}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 400\", function () { pm.response.to.have.status(400); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Trae error y detalles\", function () { var r = pm.response.json(); pm.expect(r).to.have.property(\"error\"); pm.expect(r).to.have.property(\"detalles\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /partidas - faltan campos (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/partidas",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "partidas"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 400\", function () { pm.response.to.have.status(400); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Trae error y detalles\", function () { var r = pm.response.json(); pm.expect(r).to.have.property(\"error\"); pm.expect(r).to.have.property(\"detalles\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /partidas - sin token (401)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/partidas",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "partidas"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 401\", function () { pm.response.to.have.status(401); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Trae el campo error\", function () { pm.expect(pm.response.json()).to.have.property(\"error\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /partidas - solo las propias (200)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/partidas",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "partidas"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Devuelve un array\", function () { pm.expect(pm.response.json()).to.be.an(\"array\"); });",
+                  "pm.test(\"Todas son del jugador 1\", function () { var id = parseInt(pm.collectionVariables.get(\"jugadorId\")); pm.response.json().forEach(function (p) { pm.expect(p.jugador_id).to.eql(id); }); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /partidas?jugador_id=otro - (403)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/partidas?jugador_id={{jugadorId2}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "partidas"
+              ],
+              "query": [
+                {
+                  "key": "jugador_id",
+                  "value": "{{jugadorId2}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 403\", function () { pm.response.to.have.status(403); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Trae el campo error\", function () { pm.expect(pm.response.json()).to.have.property(\"error\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /partidas/:id - propia (200)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/partidas/{{partidaId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "partidas",
+                "{{partidaId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /partidas/:id - inexistente (404)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/partidas/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "partidas",
+                "999999"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 404\", function () { pm.response.to.have.status(404); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Trae el campo error\", function () { pm.expect(pm.response.json()).to.have.property(\"error\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT /partidas/:id - jugador común (403, solo admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/partidas/{{partidaId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "partidas",
+                "{{partidaId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"puntaje\": 999999, \"nivel_jugo\": 5, \"resultado\": \"jugo\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 403\", function () { pm.response.to.have.status(403); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Trae el campo error\", function () { pm.expect(pm.response.json()).to.have.property(\"error\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH /partidas/:id - jugador común (403, solo admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/partidas/{{partidaId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "partidas",
+                "{{partidaId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"puntaje\": 999999}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 403\", function () { pm.response.to.have.status(403); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Trae el campo error\", function () { pm.expect(pm.response.json()).to.have.property(\"error\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /partidas/:id - jugador común (403, solo admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/partidas/{{partidaId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "partidas",
+                "{{partidaId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 403\", function () { pm.response.to.have.status(403); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Trae el campo error\", function () { pm.expect(pm.response.json()).to.have.property(\"error\"); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "5. Administrador (opcional: requiere adminTag y adminPassword)",
+      "item": [
+        {
+          "name": "POST /auth/login - admin (200)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"tag\": \"{{adminTag}}\", \"password\": \"{{adminPassword}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "var r = pm.response.json();",
+                  "pm.collectionVariables.set(\"tokenAdmin\", r.token);",
+                  "pm.test(\"Es administrador\", function () { pm.expect(r.jugador.rol).to.eql(\"admin\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /jugadores - admin (200)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/jugadores",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jugadores"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Devuelve un array\", function () { pm.expect(pm.response.json()).to.be.an(\"array\"); });",
+                  "pm.test(\"Nunca devuelve el hash de la contraseña\", function () { pm.expect(pm.response.text()).to.not.include(\"password_hash\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /partidas - admin ve todas (200)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/partidas",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "partidas"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Devuelve un array\", function () { pm.expect(pm.response.json()).to.be.an(\"array\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT /partidas/:id - admin reemplaza (200)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/partidas/{{partidaId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "partidas",
+                "{{partidaId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"puntaje\": 5000, \"nivel_jugo\": 2, \"resultado\": \"jugo\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"El puntaje cambió\", function () { pm.expect(pm.response.json().puntaje).to.eql(5000); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT /partidas/:id - incompleto (400)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/partidas/{{partidaId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "partidas",
+                "{{partidaId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"puntaje\": 5000}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 400\", function () { pm.response.to.have.status(400); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Trae error y detalles\", function () { var r = pm.response.json(); pm.expect(r).to.have.property(\"error\"); pm.expect(r).to.have.property(\"detalles\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH /partidas/:id - cambio parcial (200)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/partidas/{{partidaId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "partidas",
+                "{{partidaId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"nivel_jugo\": 3}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"El nivel cambió\", function () { pm.expect(pm.response.json().nivel_jugo).to.eql(3); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH /partidas/:id - cuerpo vacío (400)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/partidas/{{partidaId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "partidas",
+                "{{partidaId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 400\", function () { pm.response.to.have.status(400); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Trae error y detalles\", function () { var r = pm.response.json(); pm.expect(r).to.have.property(\"error\"); pm.expect(r).to.have.property(\"detalles\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT /partidas/:id - inexistente (404)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/partidas/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "partidas",
+                "999999"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"puntaje\": 1, \"nivel_jugo\": 1, \"resultado\": \"jugo\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 404\", function () { pm.response.to.have.status(404); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Trae el campo error\", function () { pm.expect(pm.response.json()).to.have.property(\"error\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /partidas/:id - borrado lógico (200)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/partidas/{{partidaId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "partidas",
+                "{{partidaId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /partidas/:id - ya eliminada (404)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/partidas/{{partidaId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "partidas",
+                "{{partidaId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 404\", function () { pm.response.to.have.status(404); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Trae el campo error\", function () { pm.expect(pm.response.json()).to.have.property(\"error\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /partidas/:id - ya eliminada (404)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/partidas/{{partidaId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "partidas",
+                "{{partidaId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 404\", function () { pm.response.to.have.status(404); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Trae el campo error\", function () { pm.expect(pm.response.json()).to.have.property(\"error\"); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "6. Ranking (público)",
+      "item": [
+        {
+          "name": "GET /ranking - público, sin token (200)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/ranking",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ranking"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Devuelve un array\", function () { pm.expect(pm.response.json()).to.be.an(\"array\"); });",
+                  "pm.test(\"Máximo 10 filas\", function () { pm.expect(pm.response.json().length).to.be.at.most(10); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /ranking?limite=3 (200)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/ranking?limite=3",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ranking"
+              ],
+              "query": [
+                {
+                  "key": "limite",
+                  "value": "3"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Máximo 3 filas\", function () { pm.expect(pm.response.json().length).to.be.at.most(3); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /ranking?limite=0 (400)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/ranking?limite=0",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ranking"
+              ],
+              "query": [
+                {
+                  "key": "limite",
+                  "value": "0"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 400\", function () { pm.response.to.have.status(400); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Trae el campo error\", function () { pm.expect(pm.response.json()).to.have.property(\"error\"); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "7. Extras (405, 404 de ruta, CORS)",
+      "item": [
+        {
+          "name": "PUT /ranking - método no permitido (405)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/ranking",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ranking"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 405\", function () { pm.response.to.have.status(405); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Trae el campo error\", function () { pm.expect(pm.response.json()).to.have.property(\"error\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /ruta-inexistente (404)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/ruta-inexistente",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ruta-inexistente"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 404\", function () { pm.response.to.have.status(404); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Trae el campo error\", function () { pm.expect(pm.response.json()).to.have.property(\"error\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "OPTIONS /partidas - preflight CORS (204)",
+          "request": {
+            "method": "OPTIONS",
+            "header": [
+              {
+                "key": "Origin",
+                "value": "http://localhost"
+              },
+              {
+                "key": "Access-Control-Request-Method",
+                "value": "POST"
+              },
+              {
+                "key": "Access-Control-Request-Headers",
+                "value": "authorization,content-type"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/partidas",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "partidas"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 204\", function () { pm.response.to.have.status(204); });",
+                  "pm.test(\"Trae encabezados CORS\", function () { pm.expect(pm.response.headers.has(\"Access-Control-Allow-Methods\")).to.be.true; });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "8. Limpieza",
+      "item": [
+        {
+          "name": "POST /auth/login - jugador 2 (200)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"tag\": \"{{tagUnico2}}\", \"password\": \"{{password}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "var r = pm.response.json();",
+                  "pm.collectionVariables.set(\"token2\", r.token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /jugadores/:id - jugador 2 elimina su cuenta (200)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token2}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/jugadores/{{jugadorId2}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jugadores",
+                "{{jugadorId2}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /jugadores/:id - jugador 1 intenta borrar a otro (404, ya no existe)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/jugadores/{{jugadorId2}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jugadores",
+                "{{jugadorId2}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 404\", function () { pm.response.to.have.status(404); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Trae el campo error\", function () { pm.expect(pm.response.json()).to.have.property(\"error\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /jugadores/:id - jugador 1 elimina su cuenta (200)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/jugadores/{{jugadorId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jugadores",
+                "{{jugadorId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /jugadores/:id - token de un jugador eliminado (401)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/jugadores/{{jugadorId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jugadores",
+                "{{jugadorId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 401\", function () { pm.response.to.have.status(401); });",
+                  "pm.test(\"Responde JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Trae el campo error\", function () { pm.expect(pm.response.json()).to.have.property(\"error\"); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost/fruti-caos-php/api"
+    },
+    {
+      "key": "password",
+      "value": "clave12345"
+    },
+    {
+      "key": "adminTag",
+      "value": ""
+    },
+    {
+      "key": "adminPassword",
+      "value": ""
+    },
+    {
+      "key": "tagUnico",
+      "value": ""
+    },
+    {
+      "key": "tagUnico2",
+      "value": ""
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "token2",
+      "value": ""
+    },
+    {
+      "key": "tokenAdmin",
+      "value": ""
+    },
+    {
+      "key": "jugadorId",
+      "value": ""
+    },
+    {
+      "key": "jugadorId2",
+      "value": ""
+    },
+    {
+      "key": "partidaId",
+      "value": ""
+    }
+  ]
+}

@@ -1,0 +1,3 @@
+$kind: collection
+name: "5. Administrador (opcional: requiere adminTag y adminPassword)"
+order: 5000

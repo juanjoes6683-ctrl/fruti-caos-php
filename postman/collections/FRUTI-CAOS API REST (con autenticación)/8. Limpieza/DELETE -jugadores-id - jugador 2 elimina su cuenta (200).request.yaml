@@ -1,0 +1,13 @@
+$kind: http-request
+name: DELETE /jugadores/:id - jugador 2 elimina su cuenta (200)
+url: "{{baseUrl}}/jugadores/{{jugadorId2}}"
+method: DELETE
+headers:
+  Authorization: Bearer {{token2}}
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Código HTTP 200", function () { pm.response.to.have.status(200); });
+      pm.test("Responde JSON", function () { pm.response.to.be.json; });
+    language: text/javascript
+order: 2000

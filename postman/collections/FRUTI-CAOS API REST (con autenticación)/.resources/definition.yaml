@@ -1,0 +1,54 @@
+$kind: collection
+description: "Pruebas de todos los endpoints (200, 201, 204, 400, 401, 403, 404, 405, 409). Ejecutar con Collection Runner en orden: las carpetas dependen unas de otras (guardan tokens e ids). La carpeta 5 requiere un usuario admin (ver LEEME.md): si no lo tenés, destildala en el Runner."
+variables:
+  - key: baseUrl
+    value: http://localhost/fruti-caos-php/api
+    disabled: false
+    secret: false
+  - key: password
+    value: clave12345
+    disabled: false
+    secret: false
+  - key: adminTag
+    value: ""
+    disabled: false
+    secret: false
+  - key: adminPassword
+    value: ""
+    disabled: false
+    secret: false
+  - key: tagUnico
+    value: ""
+    disabled: false
+    secret: false
+  - key: tagUnico2
+    value: ""
+    disabled: false
+    secret: false
+  - key: token
+    value: ""
+    disabled: false
+    secret: false
+  - key: token2
+    value: ""
+    disabled: false
+    secret: false
+  - key: tokenAdmin
+    value: ""
+    disabled: false
+    secret: false
+  - key: jugadorId
+    value: ""
+    disabled: false
+    secret: false
+  - key: jugadorId2
+    value: ""
+    disabled: false
+    secret: false
+  - key: partidaId
+    value: ""
+    disabled: false
+    secret: false
+  - key: bearer_token_0la3
+    secret: true
+    disabled: false

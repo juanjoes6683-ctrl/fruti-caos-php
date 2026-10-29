@@ -1,0 +1,18 @@
+$kind: http-request
+name: POST /partidas - puntaje negativo (400)
+url: "{{baseUrl}}/partidas"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Content-Type: application/json
+body:
+  type: json
+  content: '{"puntaje": -5, "nivel_jugo": 2}'
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Código HTTP 400", function () { pm.response.to.have.status(400); });
+      pm.test("Responde JSON", function () { pm.response.to.be.json; });
+      pm.test("Trae error y detalles", function () { var r = pm.response.json(); pm.expect(r).to.have.property("error"); pm.expect(r).to.have.property("detalles"); });
+    language: text/javascript
+order: 4000

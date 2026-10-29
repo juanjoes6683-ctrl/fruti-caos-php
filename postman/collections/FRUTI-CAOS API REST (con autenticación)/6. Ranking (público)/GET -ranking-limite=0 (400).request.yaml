@@ -1,0 +1,14 @@
+$kind: http-request
+name: GET /ranking?limite=0 (400)
+url: "{{baseUrl}}/ranking?limite=0"
+method: GET
+queryParams:
+  limite: "0"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Código HTTP 400", function () { pm.response.to.have.status(400); });
+      pm.test("Responde JSON", function () { pm.response.to.be.json; });
+      pm.test("Trae el campo error", function () { pm.expect(pm.response.json()).to.have.property("error"); });
+    language: text/javascript
+order: 3000

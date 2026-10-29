@@ -1,0 +1,17 @@
+$kind: http-request
+name: POST /jugadores - JSON inválido (400)
+url: "{{baseUrl}}/jugadores"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: '{"tag": '
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Código HTTP 400", function () { pm.response.to.have.status(400); });
+      pm.test("Responde JSON", function () { pm.response.to.be.json; });
+      pm.test("Trae el campo error", function () { pm.expect(pm.response.json()).to.have.property("error"); });
+    language: text/javascript
+order: 6000

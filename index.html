@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>FRUTI-CAOS</title>
+  <link rel="stylesheet" href="estilos.css" />
+  <link rel="icon" type="image/png" href="imagenes/manzanita.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap" rel="stylesheet">
+  <header> <strong> <span class="fruti-">FRUTI-</span> <span class="caos">CAOS</span> </strong> </header>
+</head>
+
+<body>
+  <!-- ===== PANTALLA DE INICIO ===== -->
+  <div id="start-screen">
+    <div class="start-card">
+      <h1 class="start-title"><span class="fruti-">FRUTI-</span><span class="caos">CAOS</span></h1>
+
+      <label for="player-tag" class="start-label">Ingresá con tu tag y contraseña</label>
+      <input type="text" id="player-tag" maxlength="20" placeholder="Tu tag (ej: FrutaNinja)" autocomplete="username" autofocus>
+      <input type="password" id="player-password" maxlength="72" placeholder="Contraseña" autocomplete="current-password">
+      <p id="tag-error"></p>
+      <button id="play-btn" type="button">JUGAR</button>
+      <button id="register-btn" type="button">Crear cuenta</button>
+
+      <div id="ranking-box">
+        <h2>🏆 Mejores jugos</h2>
+        <div id="ranking-scroll">
+        <table id="ranking-table">
+          <thead>
+            <tr><th>#</th><th>Jugador</th><th>Puntaje</th><th>Jugo</th></tr>
+          </thead>
+          <tbody>
+            <!-- Las filas las dibuja script.js con los datos de GET /api/ranking -->
+            <tr><td colspan="4" class="vacio">Cargando ranking...</td></tr>
+          </tbody>
+        </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="app">
+    <aside id="tray">
+      <h2>Canasto</h2>
+      <div id="fruits-list"></div><!-- canasto -->
+      <div class="controls">
+        <div id="score">Puntaje: 0</div>
+      </div>
+      <p class="notes"> <strong> Arrastrá una fruta al frasco. </strong> </p>
+      <p class="notes"> <strong> Fusioná dos frutas iguales para subir de nivel. </strong> </p>
+
+    </aside>
+
+
+    <main>
+      <div id="jar-wrapper">
+
+        <div id="jar-container"> 
+            <div id="jar" aria-label="Frasco de juego"></div>
+            <div id="vidrio" aria-label="vidrio encima del frasco"></div>
+        </div>
+
+        <div id="blender-base">
+          <button id="restartBtn">ON / OFF</button> <!-- Parte rosa que posee el boton-->
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+
+
+
+<!-- Mensajes de fin del juego -->
+
+  <div id="end-game-modal" class="modal-overlay">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="modal-header-title">¡Jugo Listo! 🍹</h3> <span id="modal-emoji">🏆</span>
+        </div>
+        
+
+
+        <p id="modal-message">"El anciano sonríe. ¡El portal se cierra!"</p>
+        <p class="final-stats">Puntaje de la sesión: <span id="modal-score">0</span></p>
+        <p class="final-stats">Nivel de Jugo: <span id="modal-juice-level">0</span> / 5</p>
+        <p id="save-score-msg"></p>
+        <button id="modal-restart-btn">Jugar de Nuevo</button>
+        <button id="menu-btn" type="button">Menú principal</button>
+      </div>
+  </div>
+
+
+
+  <footer>
+    <p> <p class="copyright-text"> Todos los derechos reservados al grupo 666 © 2025. ¡FRUTI-CAOS!</p> </p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

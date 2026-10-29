@@ -1,0 +1,13 @@
+# Credenciales y configuración local: NUNCA se suben al repositorio
+.env
+
+# Logs
+*.log
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Archivos de editores
+.vscode/
+.idea/

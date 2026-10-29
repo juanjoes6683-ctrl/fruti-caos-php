@@ -1,0 +1,14 @@
+$kind: http-request
+name: GET /jugadores/:id - el propio (200)
+url: "{{baseUrl}}/jugadores/{{jugadorId}}"
+method: GET
+headers:
+  Authorization: Bearer {{token}}
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Código HTTP 200", function () { pm.response.to.have.status(200); });
+      pm.test("Responde JSON", function () { pm.response.to.be.json; });
+      pm.test("Nunca devuelve el hash de la contraseña", function () { pm.expect(pm.response.text()).to.not.include("password_hash"); });
+    language: text/javascript
+order: 3000

@@ -1,0 +1,21 @@
+$kind: http-request
+name: POST /partidas - crear partida (201)
+url: "{{baseUrl}}/partidas"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Content-Type: application/json
+body:
+  type: json
+  content: '{"puntaje": 4200, "nivel_jugo": 2, "resultado": "jugo"}'
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Código HTTP 201", function () { pm.response.to.have.status(201); });
+      pm.test("Responde JSON", function () { pm.response.to.be.json; });
+      var r = pm.response.json();
+      pm.collectionVariables.set("partidaId", r.id);
+      pm.test("Devuelve el id", function () { pm.expect(r).to.have.property("id"); });
+      pm.test("Trae datos de ranking", function () { pm.expect(r.ranking).to.have.property("posicion"); pm.expect(r.jugador_id).to.eql(parseInt(pm.collectionVariables.get("jugadorId"))); });
+    language: text/javascript
+order: 2000

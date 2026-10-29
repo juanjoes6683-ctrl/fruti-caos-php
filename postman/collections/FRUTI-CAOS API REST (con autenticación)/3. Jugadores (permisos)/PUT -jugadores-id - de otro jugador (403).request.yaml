@@ -1,0 +1,18 @@
+$kind: http-request
+name: PUT /jugadores/:id - de otro jugador (403)
+url: "{{baseUrl}}/jugadores/{{jugadorId2}}"
+method: PUT
+headers:
+  Authorization: Bearer {{token}}
+  Content-Type: application/json
+body:
+  type: json
+  content: '{"tag": "Intruso"}'
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Código HTTP 403", function () { pm.response.to.have.status(403); });
+      pm.test("Responde JSON", function () { pm.response.to.be.json; });
+      pm.test("Trae el campo error", function () { pm.expect(pm.response.json()).to.have.property("error"); });
+    language: text/javascript
+order: 12000

@@ -1,0 +1,26 @@
+$kind: http-request
+name: POST /jugadores - registro jugador 1 (201)
+url: "{{baseUrl}}/jugadores"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: '{"tag": "{{tagUnico}}", "password": "{{password}}"}'
+scripts:
+  - type: beforeRequest
+    code: |-
+      pm.collectionVariables.set("tagUnico", "Tester" + Date.now().toString().slice(-6));
+      pm.collectionVariables.set("tagUnico2", "Otro" + Date.now().toString().slice(-6));
+    language: text/javascript
+  - type: afterResponse
+    code: |-
+      pm.test("Código HTTP 201", function () { pm.response.to.have.status(201); });
+      pm.test("Responde JSON", function () { pm.response.to.be.json; });
+      var r = pm.response.json();
+      pm.collectionVariables.set("jugadorId", r.id);
+      pm.test("Devuelve el id", function () { pm.expect(r).to.have.property("id"); });
+      pm.test("Nunca devuelve el hash de la contraseña", function () { pm.expect(pm.response.text()).to.not.include("password_hash"); });
+      pm.test("Rol por defecto: jugador", function () { pm.expect(r.rol).to.eql("jugador"); });
+    language: text/javascript
+order: 1000

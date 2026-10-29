@@ -1,0 +1,18 @@
+$kind: http-request
+name: PUT /partidas/:id - incompleto (400)
+url: "{{baseUrl}}/partidas/{{partidaId}}"
+method: PUT
+headers:
+  Authorization: Bearer {{tokenAdmin}}
+  Content-Type: application/json
+body:
+  type: json
+  content: '{"puntaje": 5000}'
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Código HTTP 400", function () { pm.response.to.have.status(400); });
+      pm.test("Responde JSON", function () { pm.response.to.be.json; });
+      pm.test("Trae error y detalles", function () { var r = pm.response.json(); pm.expect(r).to.have.property("error"); pm.expect(r).to.have.property("detalles"); });
+    language: text/javascript
+order: 5000

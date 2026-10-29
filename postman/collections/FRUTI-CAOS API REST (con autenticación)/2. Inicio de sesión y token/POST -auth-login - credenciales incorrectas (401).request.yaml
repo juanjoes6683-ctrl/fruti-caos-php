@@ -1,0 +1,17 @@
+$kind: http-request
+name: POST /auth/login - credenciales incorrectas (401)
+url: "{{baseUrl}}/auth/login"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: '{"tag": "{{tagUnico}}", "password": "incorrecta"}'
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Código HTTP 401", function () { pm.response.to.have.status(401); });
+      pm.test("Responde JSON", function () { pm.response.to.be.json; });
+      pm.test("Trae el campo error", function () { pm.expect(pm.response.json()).to.have.property("error"); });
+    language: text/javascript
+order: 1000

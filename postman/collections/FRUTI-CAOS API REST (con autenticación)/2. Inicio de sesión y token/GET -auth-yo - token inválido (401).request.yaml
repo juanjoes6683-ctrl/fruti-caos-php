@@ -1,0 +1,14 @@
+$kind: http-request
+name: GET /auth/yo - token inválido (401)
+url: "{{baseUrl}}/auth/yo"
+method: GET
+headers:
+  Authorization: "{{bearer_token_0la3}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Código HTTP 401", function () { pm.response.to.have.status(401); });
+      pm.test("Responde JSON", function () { pm.response.to.be.json; });
+      pm.test("Trae el campo error", function () { pm.expect(pm.response.json()).to.have.property("error"); });
+    language: text/javascript
+order: 7000

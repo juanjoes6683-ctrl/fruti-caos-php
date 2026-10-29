@@ -1,0 +1,18 @@
+$kind: http-request
+name: PATCH /jugadores/:id - cambiar contraseña (200)
+url: "{{baseUrl}}/jugadores/{{jugadorId}}"
+method: PATCH
+headers:
+  Authorization: Bearer {{token}}
+  Content-Type: application/json
+body:
+  type: json
+  content: '{"password": "nuevaclave456"}'
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Código HTTP 200", function () { pm.response.to.have.status(200); });
+      pm.test("Responde JSON", function () { pm.response.to.be.json; });
+      pm.test("Nunca devuelve el hash de la contraseña", function () { pm.expect(pm.response.text()).to.not.include("password_hash"); });
+    language: text/javascript
+order: 10000

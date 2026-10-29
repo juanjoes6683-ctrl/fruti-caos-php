@@ -1,0 +1,17 @@
+$kind: http-request
+name: PUT /ranking - método no permitido (405)
+url: "{{baseUrl}}/ranking"
+method: PUT
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: "{}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Código HTTP 405", function () { pm.response.to.have.status(405); });
+      pm.test("Responde JSON", function () { pm.response.to.be.json; });
+      pm.test("Trae el campo error", function () { pm.expect(pm.response.json()).to.have.property("error"); });
+    language: text/javascript
+order: 1000

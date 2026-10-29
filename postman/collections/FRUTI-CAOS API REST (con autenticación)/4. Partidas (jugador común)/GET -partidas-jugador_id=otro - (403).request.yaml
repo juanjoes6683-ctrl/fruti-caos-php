@@ -1,0 +1,16 @@
+$kind: http-request
+name: GET /partidas?jugador_id=otro - (403)
+url: "{{baseUrl}}/partidas?jugador_id={{jugadorId2}}"
+method: GET
+headers:
+  Authorization: Bearer {{token}}
+queryParams:
+  jugador_id: "{{jugadorId2}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Código HTTP 403", function () { pm.response.to.have.status(403); });
+      pm.test("Responde JSON", function () { pm.response.to.be.json; });
+      pm.test("Trae el campo error", function () { pm.expect(pm.response.json()).to.have.property("error"); });
+    language: text/javascript
+order: 8000

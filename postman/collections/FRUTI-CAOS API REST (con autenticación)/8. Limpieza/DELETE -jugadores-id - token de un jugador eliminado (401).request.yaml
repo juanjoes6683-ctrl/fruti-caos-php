@@ -1,0 +1,14 @@
+$kind: http-request
+name: DELETE /jugadores/:id - token de un jugador eliminado (401)
+url: "{{baseUrl}}/jugadores/{{jugadorId}}"
+method: DELETE
+headers:
+  Authorization: Bearer {{token}}
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Código HTTP 401", function () { pm.response.to.have.status(401); });
+      pm.test("Responde JSON", function () { pm.response.to.be.json; });
+      pm.test("Trae el campo error", function () { pm.expect(pm.response.json()).to.have.property("error"); });
+    language: text/javascript
+order: 5000

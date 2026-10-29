@@ -1,0 +1,19 @@
+$kind: http-request
+name: POST /jugadores - registro jugador 2 (201)
+url: "{{baseUrl}}/jugadores"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: '{"tag": "{{tagUnico2}}", "password": "{{password}}"}'
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Código HTTP 201", function () { pm.response.to.have.status(201); });
+      pm.test("Responde JSON", function () { pm.response.to.be.json; });
+      var r = pm.response.json();
+      pm.collectionVariables.set("jugadorId2", r.id);
+      pm.test("Devuelve el id", function () { pm.expect(r).to.have.property("id"); });
+    language: text/javascript
+order: 2000

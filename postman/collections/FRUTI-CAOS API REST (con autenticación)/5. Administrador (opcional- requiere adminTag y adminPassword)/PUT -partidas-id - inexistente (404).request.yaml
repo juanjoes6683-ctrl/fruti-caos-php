@@ -1,0 +1,18 @@
+$kind: http-request
+name: PUT /partidas/:id - inexistente (404)
+url: "{{baseUrl}}/partidas/999999"
+method: PUT
+headers:
+  Authorization: Bearer {{tokenAdmin}}
+  Content-Type: application/json
+body:
+  type: json
+  content: '{"puntaje": 1, "nivel_jugo": 1, "resultado": "jugo"}'
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Código HTTP 404", function () { pm.response.to.have.status(404); });
+      pm.test("Responde JSON", function () { pm.response.to.be.json; });
+      pm.test("Trae el campo error", function () { pm.expect(pm.response.json()).to.have.property("error"); });
+    language: text/javascript
+order: 8000
